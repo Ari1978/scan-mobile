@@ -1,7 +1,6 @@
 {
   "name": "Ariel Scan",
   "short_name": "ArielScan",
-  "description": "Escaneá documentos y enviá el PDF por correo fácilmente.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
