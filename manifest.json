@@ -1,19 +1,20 @@
-
 {
   "name": "Ariel Scan",
   "short_name": "ArielScan",
-  "start_url": "index.html",
+  "description": "Escaneá documentos y enviá el PDF por correo fácilmente.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a73e8",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
