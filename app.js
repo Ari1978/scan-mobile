@@ -1,4 +1,3 @@
-
 let imagenes = [];
 
 const capturaSection = document.getElementById("capturaSection");
@@ -13,16 +12,39 @@ btnAgregar.onclick = () => {
   inputFoto.click();
 };
 
-// TOMA DE FOTO / IMPORTAR IMAGEN
-inputFoto.onchange = (e) => {
+// FOTO TOMADA → Recorte PRO + Filtro PRO automático
+inputFoto.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const url = URL.createObjectURL(file);
-  imagenes.push({ file, url });
+  const originalURL = URL.createObjectURL(file);
 
-  renderPreview();
-  mostrarDetallesSiCorresponde();
+  // --- 1) Abrir UI de recorte estilo CamScanner ---
+  const cropper = new DocumentCropper({
+    image: originalURL,
+    autoDetect: true,
+    maxCanvasSize: 2048,
+    onFinish: async (croppedBlob) => {
+
+      console.log("📐 Recorte aplicado. Aplicando filtro PRO...");
+
+      // --- 2) APLICAR FILTRO PRO AUTOMÁTICO ---
+      // Usa filtro Escaneo Mejorado (OpenCV)
+      const finalBlob = await filtros.filtroEscaneo(croppedBlob);
+
+      const finalURL = URL.createObjectURL(finalBlob);
+
+      // --- 3) Guardar imagen procesada ---
+      imagenes.push({ file: finalBlob, url: finalURL });
+
+      renderPreview();
+      mostrarDetallesSiCorresponde();
+
+      cropper.destroy();
+    },
+  });
+
+  cropper.open();
 };
 
 // MOSTRAR MINIATURAS
@@ -51,24 +73,17 @@ function renderPreview() {
 
 let dragStartIndex;
 
-function dragStart() {
-  dragStartIndex = +this.dataset.index;
-}
-
-function dragOver(e) {
-  e.preventDefault();
-}
+function dragStart() { dragStartIndex = +this.dataset.index; }
+function dragOver(e) { e.preventDefault(); }
 
 function dragDrop() {
   const dragEndIndex = +this.dataset.index;
-
   [imagenes[dragStartIndex], imagenes[dragEndIndex]] =
     [imagenes[dragEndIndex], imagenes[dragStartIndex]];
-
   renderPreview();
 }
 
-// MOSTRAR DETALLES SOLO CUANDO HAYA UNA IMAGEN
+// MOSTRAR SECCIÓN DETALLES SOLO CUANDO HAYA IMÁGENES
 function mostrarDetallesSiCorresponde() {
   if (imagenes.length > 0) {
     detallesSection.classList.remove("hidden");

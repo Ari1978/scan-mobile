@@ -1,98 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ariel Scan</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ariel Scan</title>
 
-  <!-- Manifest PWA -->
-  <link rel="manifest" href="/manifest.json">
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="/manifest.json">
 
-  <!-- Estilos -->
-  <link rel="stylesheet" href="/styles.css" />
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/styles.css" />
 
-  <!-- Librería para generar PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- CSS del recortador -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.css">
 
-  <!-- Scripts de la app -->
-  <script defer src="/app.js"></script>
-  <script defer src="/pdf.js"></script>
-  <script defer src="/share.js"></script>
-</head>
+    <!-- OpenCV (NECESARIO PARA FILTROS PRO) -->
+    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 
-<body>
+    <!-- Document Cropper PRO -->
+    <script src="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.js"></script>
 
-  <header class="header">
-    <h1 class="title">Ariel Scan</h1>
-  </header>
+    <!-- Filtros PRO (DEBES CREAR filtros.js) -->
+    <script src="/filtros.js"></script>
 
-  <main class="container">
+    <!-- Librería para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- NUEVO ESCANEO -->
-    <h2 class="section-title">📄 Nuevo escaneo</h2>
+    <!-- Scripts de tu aplicación -->
+    <script defer src="/app.js"></script>
+    <script defer src="/pdf.js"></script>
+    <script defer src="/share.js"></script>
+  </head>
 
-    <!-- SECCIÓN DE CAPTURA -->
-    <div id="capturaSection">
-      <h2 class="subtitle">Agregá las páginas</h2>
+  <body>
+    <header class="header">
+      <h1 class="title">Ariel Scan</h1>
+    </header>
 
-      <!-- INPUT OCULTO PARA LA CÁMARA -->
-      <input
-        id="inputFoto"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        class="hidden"
-      />
+    <main class="container">
+      <!-- NUEVO ESCANEO -->
+      <h2 class="section-title">📄 Nuevo escaneo</h2>
 
-      <p class="hint">Podés agregar todas las páginas que necesites.</p>
+      <!-- SECCIÓN DE CAPTURA -->
+      <div id="capturaSection">
+        <h2 class="subtitle">Agregá las páginas</h2>
 
-      <!-- BOTÓN PARA ABRIR CÁMARA -->
-      <button id="btnAgregar" class="btn-camera">
-        📷 Agregar página
-      </button>
+        <!-- INPUT OCULTO PARA LA CÁMARA -->
+        <input
+          id="inputFoto"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          class="hidden"
+        />
 
-      <!-- PREVIEW DE IMÁGENES -->
-      <ul id="previewList" class="preview-list"></ul>
+        <p class="hint">Podés agregar todas las páginas que necesites.</p>
 
-      <!-- CONTINUAR (decorativo) -->
-      <h2 class="section-title">➡️ Continuar</h2>
-    </div>
+        <!-- BOTÓN PARA ABRIR CÁMARA -->
+        <button id="btnAgregar" class="btn-camera">
+          📷 Agregar página
+        </button>
 
-    <!-- SECCIÓN DETALLES -->
-    <div id="detallesSection" class="hidden">
-      <h2 class="subtitle">Detalles del documento</h2>
+        <!-- PREVIEW DE IMÁGENES -->
+        <ul id="previewList" class="preview-list"></ul>
 
-      <label>Nombre del PDF</label>
-      <input
-        id="nombrePdf"
-        type="text"
-        placeholder="Ej.: Documento_1"
-        class="input"
-      />
+        <!-- CONTINUAR (decorativo) -->
+        <h2 class="section-title">➡️ Continuar</h2>
+      </div>
 
-      <label>Email destino</label>
-      <input
-        value="impresioncencosud@gmail.com"
-        class="input disabled"
-        disabled
-      />
+      <!-- SECCIÓN DETALLES -->
+      <div id="detallesSection" class="hidden">
+        <h2 class="subtitle">Detalles del documento</h2>
 
-      <button id="btnEnviar" class="btn-primary mt-lg">
-        📤 Generar y enviar
-      </button>
-    </div>
+        <label>Nombre del PDF</label>
+        <input
+          id="nombrePdf"
+          type="text"
+          placeholder="Ej.: Documento_1"
+          class="input"
+        />
 
-  </main>
+        <label>Email destino</label>
+        <input
+          value="impresioncencosud@gmail.com"
+          class="input disabled"
+          disabled
+        />
 
-  <!-- REGISTRO DEL SERVICE WORKER (OBLIGATORIO PARA PWA) -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/service-worker.js", { scope: "/" })
-        .then(reg => console.log("Service Worker registrado con scope /", reg))
-        .catch(err => console.error("Error registrando SW:", err));
-    }
-  </script>
+        <button id="btnEnviar" class="btn-primary mt-lg">
+          📤 Generar y enviar
+        </button>
+      </div>
+    </main>
 
-</body>
+    <!-- REGISTRO DEL SERVICE WORKER -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/service-worker.js", { scope: "/" })
+          .then((reg) =>
+            console.log("Service Worker registrado correctamente", reg)
+          )
+          .catch((err) => console.error("Error registrando SW:", err));
+      }
+    </script>
+  </body>
 </html>
