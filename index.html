@@ -6,18 +6,18 @@
   <title>Ariel Scan</title>
 
   <!-- Manifest PWA -->
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="/manifest.json">
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 
   <!-- Librería para generar PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- Scripts de la app -->
-  <script defer src="app.js"></script>
-  <script defer src="pdf.js"></script>
-  <script defer src="share.js"></script>
+  <script defer src="/app.js"></script>
+  <script defer src="/pdf.js"></script>
+  <script defer src="/share.js"></script>
 </head>
 
 <body>
@@ -88,9 +88,9 @@
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/service-worker.js")
-        .then(() => console.log("Service Worker registrado correctamente"))
-        .catch((err) => console.log("Error registrando SW:", err));
+        .register("/service-worker.js", { scope: "/" })
+        .then(reg => console.log("Service Worker registrado con scope /", reg))
+        .catch(err => console.error("Error registrando SW:", err));
     }
   </script>
 
