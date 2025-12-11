@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1a73e8" />
     <title>Ariel Scan</title>
 
     <!-- Manifest PWA -->
@@ -14,13 +15,13 @@
     <!-- CSS del recortador -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.css">
 
-    <!-- OpenCV (NECESARIO PARA FILTROS PRO) -->
-    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+    <!-- OpenCV (DEBE CARGAR PRIMERO) -->
+    <script src="https://docs.opencv.org/4.x/opencv.js" crossorigin="anonymous"></script>
 
     <!-- Document Cropper PRO -->
     <script src="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.js"></script>
 
-    <!-- Filtros PRO (DEBES CREAR filtros.js) -->
+    <!-- Filtros PRO -->
     <script src="/filtros.js"></script>
 
     <!-- Librería para generar PDF -->
@@ -93,15 +94,13 @@
       </div>
     </main>
 
-    <!-- REGISTRO DEL SERVICE WORKER -->
+    <!-- SERVICE WORKER -->
     <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
-          .register("/service-worker.js", { scope: "/" })
-          .then((reg) =>
-            console.log("Service Worker registrado correctamente", reg)
-          )
-          .catch((err) => console.error("Error registrando SW:", err));
+          .register("/service-worker.js")
+          .then((reg) => console.log("Service Worker OK", reg))
+          .catch((err) => console.error("Error SW:", err));
       }
     </script>
   </body>

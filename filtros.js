@@ -1,3 +1,16 @@
+// ----------------------
+// FIX: createImageBitmap fallback (Android / iPhone)
+// ----------------------
+if (typeof createImageBitmap !== "function") {
+  window.createImageBitmap = async function (blob) {
+    return await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = URL.createObjectURL(blob);
+    });
+  };
+}
+
 // Esperar a que OpenCV cargue
 function cvReady() {
   return new Promise(resolve => {
@@ -8,13 +21,21 @@ function cvReady() {
 
 // Blob → Mat
 async function blobToMat(blob) {
+  await cvReady();
   const img = await createImageBitmap(blob);
-  let mat = cv.imread(img);
-  return mat;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+
+  return cv.imread(canvas);
 }
 
 // Mat → Blob PNG
-function matToBlob(mat) {
+async function matToBlob(mat) {
   let canvas = document.createElement("canvas");
   cv.imshow(canvas, mat);
 
@@ -27,18 +48,14 @@ function matToBlob(mat) {
 // FILTRO: BLANCO Y NEGRO PRO
 // ----------------------
 async function filtroBN(blob) {
-  await cvReady();
   let mat = await blobToMat(blob);
 
   cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
   cv.adaptiveThreshold(
-    mat,
-    mat,
-    255,
+    mat, mat, 255,
     cv.ADAPTIVE_THRESH_GAUSSIAN_C,
     cv.THRESH_BINARY,
-    51,
-    10
+    51, 10
   );
 
   let result = await matToBlob(mat);
@@ -50,7 +67,6 @@ async function filtroBN(blob) {
 // FILTRO: ALTO CONTRASTE
 // ----------------------
 async function filtroAltoContraste(blob) {
-  await cvReady();
   let mat = await blobToMat(blob);
 
   let min = { minVal: 0 };
@@ -68,17 +84,16 @@ async function filtroAltoContraste(blob) {
 }
 
 // ----------------------
-// FILTRO: ESCANEO MEJORADO (automático PRO)
+// FILTRO: ESCANEO MEJORADO PRO
 // ----------------------
 async function filtroEscaneo(blob) {
-  await cvReady();
   let mat = await blobToMat(blob);
 
   // Suavizado
   let smooth = new cv.Mat();
   cv.GaussianBlur(mat, smooth, new cv.Size(3, 3), 0);
 
-  // Sharpen para letras
+  // Sharpen
   let kernel = cv.matFromArray(3, 3, cv.CV_32F, [
      0, -1,  0,
     -1,  5, -1,
@@ -86,9 +101,14 @@ async function filtroEscaneo(blob) {
   ]);
   cv.filter2D(smooth, mat, -1, kernel);
 
-  // Limpieza de sombras
+  // Umbral inteligente
   cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
-  cv.adaptiveThreshold(mat, mat, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 51, 5);
+  cv.adaptiveThreshold(
+    mat, mat, 255,
+    cv.ADAPTIVE_THRESH_MEAN_C,
+    cv.THRESH_BINARY,
+    51, 5
+  );
 
   smooth.delete();
   kernel.delete();

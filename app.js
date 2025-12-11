@@ -7,83 +7,87 @@ const btnAgregar = document.getElementById("btnAgregar");
 const inputFoto = document.getElementById("inputFoto");
 const previewList = document.getElementById("previewList");
 
-// ABRIR CÁMARA
+/* -----------------------------
+   ABRIR CÁMARA
+------------------------------ */
 btnAgregar.onclick = () => {
+  inputFoto.value = ""; // Permitir tomar misma foto dos veces
   inputFoto.click();
 };
 
-// FOTO TOMADA → Recorte PRO + Filtro PRO automático
+/* -----------------------------
+   CUANDO SE TOMA UNA FOTO
+------------------------------ */
 inputFoto.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const originalURL = URL.createObjectURL(file);
+  try {
+    const originalURL = URL.createObjectURL(file);
 
-  // --- 1) Abrir UI de recorte estilo CamScanner ---
-  const cropper = new DocumentCropper({
-    image: originalURL,
-    autoDetect: true,
-    maxCanvasSize: 2048,
-    onFinish: async (croppedBlob) => {
+    // -------------------------------------------
+    // ABRIR RECORTE TIPO CAMSCANNER
+    // -------------------------------------------
+    const cropper = new DocumentCropper({
+      image: originalURL,
+      autoDetect: true,
+      maxCanvasSize: 2200,
+      onFinish: async (croppedBlob) => {
+        try {
+          // -------------------------------------------
+          // APLICAR FILTRO DE ESCANEO PRO
+          // -------------------------------------------
+          const imagenProcesada = await filtros.filtroEscaneo(croppedBlob);
 
-      console.log("📐 Recorte aplicado. Aplicando filtro PRO...");
+          const finalURL = URL.createObjectURL(imagenProcesada);
 
-      // --- 2) APLICAR FILTRO PRO AUTOMÁTICO ---
-      // Usa filtro Escaneo Mejorado (OpenCV)
-      const finalBlob = await filtros.filtroEscaneo(croppedBlob);
+          imagenes.push({
+            file: imagenProcesada,
+            url: finalURL
+          });
 
-      const finalURL = URL.createObjectURL(finalBlob);
+          renderPreview();
+          mostrarDetallesSiCorresponde();
 
-      // --- 3) Guardar imagen procesada ---
-      imagenes.push({ file: finalBlob, url: finalURL });
+        } catch (err) {
+          console.error("Error procesando imagen:", err);
+          alert("Hubo un error procesando la imagen.");
+        }
 
-      renderPreview();
-      mostrarDetallesSiCorresponde();
+        cropper.destroy();
+      }
+    });
 
-      cropper.destroy();
-    },
-  });
+    cropper.open();
 
-  cropper.open();
+  } catch (err) {
+    console.error("Error abriendo cropper:", err);
+    alert("No se pudo abrir el recorte.");
+  }
 };
 
-// MOSTRAR MINIATURAS
+/* -----------------------------
+   MOSTRAR VISTAS PREVIAS
+------------------------------ */
 function renderPreview() {
   previewList.innerHTML = "";
 
   imagenes.forEach((img, i) => {
     const li = document.createElement("li");
     li.className = "preview-item";
-    li.draggable = true;
-    li.dataset.index = i;
 
     li.innerHTML = `
-      <span class="drag-handle">☰</span>
       <img src="${img.url}">
       <span>Página ${i + 1}</span>
     `;
 
     previewList.appendChild(li);
-
-    li.addEventListener("dragstart", dragStart);
-    li.addEventListener("dragover", dragOver);
-    li.addEventListener("drop", dragDrop);
   });
 }
 
-let dragStartIndex;
-
-function dragStart() { dragStartIndex = +this.dataset.index; }
-function dragOver(e) { e.preventDefault(); }
-
-function dragDrop() {
-  const dragEndIndex = +this.dataset.index;
-  [imagenes[dragStartIndex], imagenes[dragEndIndex]] =
-    [imagenes[dragEndIndex], imagenes[dragStartIndex]];
-  renderPreview();
-}
-
-// MOSTRAR SECCIÓN DETALLES SOLO CUANDO HAYA IMÁGENES
+/* -----------------------------
+   MOSTRAR DETALLES
+------------------------------ */
 function mostrarDetallesSiCorresponde() {
   if (imagenes.length > 0) {
     detallesSection.classList.remove("hidden");
