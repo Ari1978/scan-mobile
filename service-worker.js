@@ -2,12 +2,15 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open("ariel-scan-v1").then((cache) => {
       return cache.addAll([
-        "index.html",
-        "styles.css",
-        "app.js",
-        "pdf.js",
-        "share.js",
-        "manifest.json"
+        "/",
+        "/index.html",
+        "/styles.css",
+        "/app.js",
+        "/pdf.js",
+        "/share.js",
+        "/manifest.json",
+        "/icons/icon-192.png",
+        "/icons/icon-512.png"
       ]);
     })
   );
