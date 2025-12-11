@@ -2,7 +2,7 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open("ariel-scan-v1").then((cache) => {
       return cache.addAll([
-        "/",
+        "/",                   // raíz del sitio
         "/index.html",
         "/styles.css",
         "/app.js",
@@ -18,6 +18,8 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
+    caches.match(e.request).then((res) => {
+      return res || fetch(e.request);
+    })
   );
 });
