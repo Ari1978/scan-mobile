@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ariel Scan</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Librería para generar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Scripts de tu app -->
+  <script defer src="app.js"></script>
+  <script defer src="pdf.js"></script>
+  <script defer src="share.js"></script>
+</head>
+
+<body>
+
+  <header class="header">
+    <h1 class="title">Ariel Scan</h1>
+  </header>
+
+  <main class="container">
+
+    <!-- NUEVO ESCANEO (título elegante) -->
+    <h2 class="section-title">📄 Nuevo escaneo</h2>
+    
+    <!-- SECCIÓN DE CAPTURA -->
+    <div id="capturaSection">
+      <h2 class="subtitle">Agregá las páginas</h2>
+
+      <!-- INPUT FILE OCULTO PARA LA CÁMARA -->
+      <input 
+        id="inputFoto" 
+        type="file" 
+        accept="image/*"
+        capture="environment"
+        class="hidden"
+      >
+
+      <p class="hint">Podés agregar todas las páginas que necesites.</p>
+
+      <!-- BOTÓN PRINCIPAL PARA ABRIR LA CÁMARA -->
+      <button id="btnAgregar" class="btn-camera">
+        📷 Agregar página
+      </button>
+
+      <!-- PREVIEWS DE LAS IMÁGENES -->
+      <ul id="previewList" class="preview-list"></ul>
+
+      <!-- CONTINUAR (solo decorativo) -->
+      <h2 class="section-title">➡️ Continuar</h2>
+    </div>
+
+    <!-- SECCIÓN DETALLES -->
+    <div id="detallesSection" class="hidden">
+      <h2 class="subtitle">Detalles del documento</h2>
+
+      <label>Nombre del PDF</label>
+      <input 
+        id="nombrePdf" 
+        type="text" 
+        placeholder="Ej.: Documento_1" 
+        class="input"
+      >
+
+      <label>Email destino</label>
+      <input 
+        value="impresioncencosud@gmail.com" 
+        class="input disabled" 
+        disabled
+      >
+
+      <button id="btnEnviar" class="btn-primary mt-lg">
+        📤 Generar y enviar
+      </button>
+    </div>
+
+  </main>
+
+</body>
+</html>
