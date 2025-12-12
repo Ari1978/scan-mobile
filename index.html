@@ -6,28 +6,22 @@
     <meta name="theme-color" content="#1a73e8" />
     <title>Ariel Scan</title>
 
-    <!-- Manifest PWA -->
+    <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
 
     <!-- Estilos -->
     <link rel="stylesheet" href="/styles.css" />
 
-    <!-- CSS del recortador -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.css">
+    <!-- SmartCrop.js -->
+    <script src="https://unpkg.com/smartcrop@2.0.4/smartcrop.js"></script>
 
-    <!-- OpenCV (DEBE CARGAR PRIMERO) -->
-    <script src="https://docs.opencv.org/4.x/opencv.js" crossorigin="anonymous"></script>
-
-    <!-- Document Cropper PRO -->
-    <script src="https://cdn.jsdelivr.net/npm/document-cropper@latest/dist/document-cropper.min.js"></script>
-
-    <!-- Filtros PRO -->
+    <!-- Filtros -->
     <script src="/filtros.js"></script>
 
-    <!-- Librería para generar PDF -->
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Scripts de tu aplicación -->
+    <!-- App -->
     <script defer src="/app.js"></script>
     <script defer src="/pdf.js"></script>
     <script defer src="/share.js"></script>
@@ -39,69 +33,46 @@
     </header>
 
     <main class="container">
-      <!-- NUEVO ESCANEO -->
-      <h2 class="section-title">📄 Nuevo escaneo</h2>
 
-      <!-- SECCIÓN DE CAPTURA -->
-      <div id="capturaSection">
-        <h2 class="subtitle">Agregá las páginas</h2>
+      <!-- CAPTURA -->
+      <section id="capturaSection" class="card">
+        <h2 class="section-title">📄 Nuevo escaneo</h2>
+        <p class="hint">Agregá las páginas de tu documento.</p>
 
-        <!-- INPUT OCULTO PARA LA CÁMARA -->
-        <input
-          id="inputFoto"
-          type="file"
-          accept="image/*"
-          capture="environment"
-          class="hidden"
-        />
+        <input id="inputFoto" type="file" accept="image/*" capture="environment" class="hidden" />
 
-        <p class="hint">Podés agregar todas las páginas que necesites.</p>
-
-        <!-- BOTÓN PARA ABRIR CÁMARA -->
-        <button id="btnAgregar" class="btn-camera">
+        <button id="btnAgregar" class="btn-primary full">
           📷 Agregar página
         </button>
 
-        <!-- PREVIEW DE IMÁGENES -->
         <ul id="previewList" class="preview-list"></ul>
 
-        <!-- CONTINUAR (decorativo) -->
+        <div class="divider"></div>
         <h2 class="section-title">➡️ Continuar</h2>
-      </div>
+      </section>
 
-      <!-- SECCIÓN DETALLES -->
-      <div id="detallesSection" class="hidden">
-        <h2 class="subtitle">Detalles del documento</h2>
+      <!-- DETALLES -->
+      <section id="detallesSection" class="card hidden">
+        <h2 class="section-title">Detalles del documento</h2>
 
         <label>Nombre del PDF</label>
-        <input
-          id="nombrePdf"
-          type="text"
-          placeholder="Ej.: Documento_1"
-          class="input"
-        />
+        <input id="nombrePdf" class="input" placeholder="Ej.: Documento_1" />
 
         <label>Email destino</label>
-        <input
-          value="impresioncencosud@gmail.com"
-          class="input disabled"
-          disabled
-        />
+        <input value="impresioncencosud@gmail.com" class="input disabled" disabled />
 
-        <button id="btnEnviar" class="btn-primary mt-lg">
+        <button id="btnEnviar" class="btn-success full mt-lg">
           📤 Generar y enviar
         </button>
-      </div>
+      </section>
     </main>
 
-    <!-- SERVICE WORKER -->
+    <!-- SW -->
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/service-worker.js")
-          .then((reg) => console.log("Service Worker OK", reg))
-          .catch((err) => console.error("Error SW:", err));
+        navigator.serviceWorker.register("/service-worker.js");
       }
     </script>
+
   </body>
 </html>

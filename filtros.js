@@ -1,126 +1,163 @@
-// ----------------------
-// FIX: createImageBitmap fallback (Android / iPhone)
-// ----------------------
-if (typeof createImageBitmap !== "function") {
-  window.createImageBitmap = async function (blob) {
-    return await new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.src = URL.createObjectURL(blob);
-    });
-  };
-}
+/* ==========================================================
+      FILTROS PRO PARA ARIEL SCAN — VERCEL SAFE
+      Sin OpenCV — Canvas + JS puro
+========================================================== */
 
-// Esperar a que OpenCV cargue
-function cvReady() {
-  return new Promise(resolve => {
-    if (cv && cv.Mat) resolve();
-    else cv['onRuntimeInitialized'] = resolve;
+window.filtros = {}; // namespace global
+
+/* ==========================================================
+   AUXILIARES
+========================================================== */
+
+// Convierte Blob → Imagen HTML
+async function blobToImage(blob) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = URL.createObjectURL(blob);
   });
 }
 
-// Blob → Mat
-async function blobToMat(blob) {
-  await cvReady();
-  const img = await createImageBitmap(blob);
-
+// Crea un canvas del tamaño deseado
+function createCanvas(w, h) {
   const canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
+  canvas.width = w;
+  canvas.height = h;
+  return canvas;
+}
 
-  const ctx = canvas.getContext("2d");
+// Convierte canvas a Blob JPG alta calidad
+function canvasToBlob(canvas) {
+  return new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", 0.9)
+  );
+}
+
+/* ==========================================================
+   1) FILTRO ESCANEO PRO (Contraste + B&N suave + brillo)
+========================================================== */
+filtros.filtroEscaneo = async function (blob) {
+  const img = await blobToImage(blob);
+
+  const canvas = createCanvas(img.width, img.height);
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
   ctx.drawImage(img, 0, 0);
 
-  return cv.imread(canvas);
-}
+  let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let data = imgData.data;
 
-// Mat → Blob PNG
-async function matToBlob(mat) {
-  let canvas = document.createElement("canvas");
-  cv.imshow(canvas, mat);
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
 
-  return new Promise(resolve => {
-    canvas.toBlob(resolve, "image/png", 1.0);
-  });
-}
+    // Gris suave
+    let gray = (r + g + b) / 3;
 
-// ----------------------
-// FILTRO: BLANCO Y NEGRO PRO
-// ----------------------
-async function filtroBN(blob) {
-  let mat = await blobToMat(blob);
+    // Contraste
+    gray = ((gray - 128) * 1.35) + 128;
 
-  cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
-  cv.adaptiveThreshold(
-    mat, mat, 255,
-    cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-    cv.THRESH_BINARY,
-    51, 10
-  );
+    // Brillo leve
+    gray += 8;
 
-  let result = await matToBlob(mat);
-  mat.delete();
-  return result;
-}
+    // Limitar valores
+    gray = Math.min(255, Math.max(0, gray));
 
-// ----------------------
-// FILTRO: ALTO CONTRASTE
-// ----------------------
-async function filtroAltoContraste(blob) {
-  let mat = await blobToMat(blob);
+    data[i] = data[i + 1] = data[i + 2] = gray;
+  }
 
-  let min = { minVal: 0 };
-  let max = { maxVal: 255 };
-  cv.minMaxLoc(mat, min, max);
+  ctx.putImageData(imgData, 0, 0);
 
-  let alpha = 255 / (max.maxVal - min.minVal);
-  let beta = -min.minVal * alpha;
+  return await canvasToBlob(canvas);
+};
 
-  mat.convertTo(mat, -1, alpha, beta);
+/* ==========================================================
+   2) BLANCO Y NEGRO (Umbral)
+========================================================== */
+filtros.filtroBlancoNegro = async function (blob) {
+  const img = await blobToImage(blob);
 
-  let result = await matToBlob(mat);
-  mat.delete();
-  return result;
-}
+  const canvas = createCanvas(img.width, img.height);
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-// ----------------------
-// FILTRO: ESCANEO MEJORADO PRO
-// ----------------------
-async function filtroEscaneo(blob) {
-  let mat = await blobToMat(blob);
+  ctx.drawImage(img, 0, 0);
 
-  // Suavizado
-  let smooth = new cv.Mat();
-  cv.GaussianBlur(mat, smooth, new cv.Size(3, 3), 0);
+  let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let data = imgData.data;
 
-  // Sharpen
-  let kernel = cv.matFromArray(3, 3, cv.CV_32F, [
-     0, -1,  0,
-    -1,  5, -1,
-     0, -1,  0
-  ]);
-  cv.filter2D(smooth, mat, -1, kernel);
+  for (let i = 0; i < data.length; i += 4) {
+    const v = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const bin = v > 128 ? 255 : 0;
+    data[i] = data[i + 1] = data[i + 2] = bin;
+  }
 
-  // Umbral inteligente
-  cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
-  cv.adaptiveThreshold(
-    mat, mat, 255,
-    cv.ADAPTIVE_THRESH_MEAN_C,
-    cv.THRESH_BINARY,
-    51, 5
-  );
+  ctx.putImageData(imgData, 0, 0);
 
-  smooth.delete();
-  kernel.delete();
+  return await canvasToBlob(canvas);
+};
 
-  let result = await matToBlob(mat);
-  mat.delete();
-  return result;
-}
+/* ==========================================================
+   3) NITIDEZ (Sharpen)
+========================================================== */
+filtros.filtroNitidez = async function (blob) {
+  const img = await blobToImage(blob);
 
-// Export
-window.filtros = {
-  filtroEscaneo,
-  filtroBN,
-  filtroAltoContraste
+  const canvas = createCanvas(img.width, img.height);
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  ctx.drawImage(img, 0, 0);
+
+  let { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let output = new Uint8ClampedArray(data);
+
+  const kernel = [
+    0, -1, 0,
+   -1,  5, -1,
+    0, -1, 0
+  ];
+
+  const half = 1;
+  const kSize = 3;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+
+      let idx = (y * width + x) * 4;
+      let r = 0, g = 0, b = 0;
+
+      for (let ky = -half; ky <= half; ky++) {
+        for (let kx = -half; kx <= half; kx++) {
+          const px = x + kx;
+          const py = y + ky;
+
+          if (px >= 0 && px < width && py >= 0 && py < height) {
+            const i = (py * width + px) * 4;
+            const k = kernel[(ky + half) * kSize + (kx + half)];
+
+            r += data[i] * k;
+            g += data[i + 1] * k;
+            b += data[i + 2] * k;
+          }
+        }
+      }
+
+      output[idx]     = Math.min(255, Math.max(0, r));
+      output[idx + 1] = Math.min(255, Math.max(0, g));
+      output[idx + 2] = Math.min(255, Math.max(0, b));
+    }
+  }
+
+  ctx.putImageData(new ImageData(output, width, height), 0, 0);
+
+  return await canvasToBlob(canvas);
+};
+
+/* ==========================================================
+   4) AUTO-SCAN (tipo CamScanner)
+========================================================== */
+filtros.filtroAutoScan = async function (blob) {
+  const etapa1 = await filtros.filtroEscaneo(blob);
+  const etapa2 = await filtros.filtroNitidez(etapa1);
+  return etapa2;
 };

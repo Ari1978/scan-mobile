@@ -1,26 +1,40 @@
-/* ---------------------------
-   Estilo base general
----------------------------- */
+/* ==========================================================
+   ESTILO BASE — ARIEL SCAN
+   Profesional, limpio y mobile-first
+========================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f9fc;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f4f6f9;
   color: #333;
 }
+
+/* ==========================================================
+   HEADER
+========================================================== */
 
 .header {
   padding: 20px;
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e5e5e5;
   background: #ffffff;
 }
 
 .title {
-  font-size: 26px;
+  font-size: 28px;
   margin: 0;
   color: #1a73e8;
   font-weight: 700;
 }
+
+/* ==========================================================
+   CONTENEDOR PRINCIPAL
+========================================================== */
 
 .container {
   padding: 20px;
@@ -28,76 +42,144 @@ body {
   margin: auto;
 }
 
-/* ---------------------------
-   Botones
----------------------------- */
+/* ==========================================================
+   CARDS (usadas en captura + detalles)
+========================================================== */
 
+.card {
+  background: #ffffff;
+  padding: 20px;
+  margin-top: 25px;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  animation: fadeIn 0.3s ease;
+}
+
+/* ==========================================================
+   TITULOS ELEGANTES
+========================================================== */
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  padding: 12px 0;
+  margin: 20px 0;
+  color: #1a73e8;
+  background: #e8f0fe;
+  border-radius: 12px;
+}
+
+/* Subtítulos */
+.subtitle {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* ==========================================================
+   BOTONES
+========================================================== */
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Botón primario */
 .btn-primary {
   background: linear-gradient(135deg, #1a73e8, #4285f4);
   color: white;
   padding: 15px;
   width: 100%;
-  border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.15);
   transition: background 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 12px;
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #1765cc, #3b78e6);
-  box-shadow: 0px 3px 12px rgba(0,0,0,0.2);
+  box-shadow: 0px 4px 14px rgba(0,0,0,0.25);
 }
 
-.btn-secondary {
-  background: #e8f0fe;
+/* Botón éxito */
+.btn-success {
+  background: linear-gradient(135deg, #0f9d58, #25b36b);
+  color: white;
+  padding: 15px;
+  width: 100%;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #0c874b, #1fa35f);
+  box-shadow: 0px 4px 14px rgba(0,0,0,0.25);
+}
+
+/* Botón cámara */
+.btn-camera {
+  background: #ffffff;
+  border: 2px solid #1a73e8;
+  border-radius: 14px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
   color: #1a73e8;
-  padding: 12px;
   width: 100%;
-  border: none;
-  border-radius: 10px;
-  margin-top: 15px;
-  font-weight: 600;
-  transition: background 0.2s ease;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.12);
 }
 
-.btn-secondary:hover {
-  background: #d7e5ff;
+.btn-camera:hover {
+  background: #e8f0fe;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.18);
 }
 
-/* ---------------------------
-   Formularios
----------------------------- */
+/* ==========================================================
+   FORMULARIOS
+========================================================== */
 
-.input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+.label {
   font-size: 15px;
-  background: white;
-}
-
-.disabled {
-  background: #f4f4f4;
-  color: #999;
-}
-
-.subtitle {
-  margin-top: 25px;
-  margin-bottom: 10px;
-  font-size: 20px;
-  font-weight: 600;
+  margin-top: 10px;
+  display: block;
   color: #444;
 }
 
-/* ---------------------------
-   Lista de previews
----------------------------- */
+.input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+}
+
+.input.disabled {
+  background: #f2f2f2;
+  color: #999;
+}
+
+/* ==========================================================
+   LISTA DE PREVIEWS
+========================================================== */
 
 .preview-list {
   list-style: none;
@@ -131,94 +213,43 @@ body {
   border-radius: 8px;
 }
 
-.drag-handle {
-  cursor: grab;
-  font-size: 22px;
-  color: #888;
-}
+/* ==========================================================
+   TEXTO AUXILIAR
+========================================================== */
 
 .hint {
-  font-size: 13px;
-  color: #777;
+  font-size: 14px;
+  color: #666;
   margin-top: 6px;
 }
 
-/* ---------------------------
-   Animaciones suaves
----------------------------- */
+/* ==========================================================
+   EFECTO DE ENTRADA
+========================================================== */
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------------------------
-   Títulos elegantes (Nuevo escaneo / Continuar)
----------------------------- */
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  padding: 12px 0;
-  margin: 25px 0;
-  color: #1a73e8;
-  background: #e8f0fe;
-  border-radius: 12px;
-}
+/* ==========================================================
+   UTILIDADES
+========================================================== */
 
-
-/* ---------------------------
-   Botón de cámara (Agregar página)
----------------------------- */
-.btn-camera {
-  background: #ffffff;
-  border: 2px solid #1a73e8;
-  border-radius: 14px;
-  padding: 18px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a73e8;
-  width: 100%;
-  margin-top: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-}
-
-.btn-camera:hover {
-  background: #e8f0fe;
-  transform: translateY(-2px);
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-}
-
-
-/* Icono de la cámara más grande */
-.btn-camera::before {
-  font-size: 26px;
-}
-
-
-/* ---------------------------
-   Ocultar elementos
----------------------------- */
 .hidden {
   display: none;
 }
 
-
-/* ---------------------------
-   Espaciado grande
----------------------------- */
 .mt-lg {
   margin-top: 30px;
+}
+
+.full {
+  width: 100%;
+}
+
+.divider {
+  height: 1px;
+  background: #ececec;
+  margin: 25px 0;
 }
